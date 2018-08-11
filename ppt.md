@@ -42,23 +42,19 @@ Fighting
 
 - HTTPS 是否 100%安全？
 
-???
-
-Strict-Transport-Security: max-age=31536000
-
-添加到 HSTS 列表 https://hstspreload.org/ google 维护
-
-[HTTP Strict Transport Security](https://developer.mozilla.org/zh-CN/docs/Security/HTTP_Strict_Transport_Security)
-
-## 本地添加测试 chrome://net-internals/#hsts
+---
 
 # HTTP
 
 ???
 
+任何东西的出现及流行，有其必然性。
+
+http 为什么不再满足需求，而出现了 https
+
 超文本传输协议（HTTP，HyperText Transfer Protocol)是互联网上应用最为广泛的一种网络协议。
 
-http 弊端：不安全，等同于裸奔
+http 弊端：不安全，等同于裸奔，现在 http 的网站会被浏览器标识为不安全
 
 类似的，我们常用来接收的短信验证码，如果是用的 2G 或 3G 网络，那么也完全是裸奔的。
 而 4G 的 TD-LTE FDD-LTE 是比较安全的
@@ -97,7 +93,7 @@ http 弊端：不安全，等同于裸奔
 
 对称加密：AES、DES、3DES 速度快、密钥唯一
 
-非对称加密：RSA 速度慢、有一对密钥
+非对称加密：RSA 速度慢、有一对密钥，加密用一个密钥，解密用另一个密钥
 
 ---
 
@@ -160,11 +156,11 @@ http 弊端：不安全，等同于裸奔
 
 ---
 
-数字证书
+数字签名
 
 ???
 
-数字证书是什么？为什么可以证明服务器身份？
+数字签名是什么？为什么可以证明服务器身份？
 
 ---
 
@@ -254,106 +250,69 @@ https://www.websequencediagrams.com/
 
 DV、OV、EV
 
+???
+
+[腾讯云](https://cloud.tencent.com/product/ssl)
+
+证书本身的制作成本为 0，你自己生成证书，给它签个名而已，但 ov、ev 的收费为什么这么高昂？
+
+1. 信用担保、保险、法律开销
+2. 浏览器、系统对植入根证书需要收费
+3. webTrust 年度审计
+4. .....
+
 ---
 
-- g 全局搜索
-- i 不区分大小写
-- m 多行模式
-- u unicode
-- y 粘性匹配
+全站升级 https 就固若金汤了吗？
 
 ???
 
-```javascript
-'123abc456def789'.match(/\d+/); // 全局搜索案例
-
-'aaaaa'.match(/A/); // 忽略大小写
-`aa 
-`.match(/^\w+$/); // 多行匹配
-
-// 粘性匹配
-var re = /\d{2}/y;
-re.lastIndex = 2;
-re.exec('12!34');
-
-// 对比全局匹配
-var re = /\d{2}/g;
-re.lastIndex = 2;
-re.exec('12!34');
-```
+对比 taobao.com 与 yaf.eryafast.com 的 http 跳转 https 区别
 
 ---
 
-# Backtrack
+SSLstrip
 
---
+---
 
-# 回溯
+![SSLstrip](./images/sslstrip.png)
 
 ???
 
-```javascript
-/ab{1,3}bbc/.test('abbbc');
-```
+[大图](./images/sslstrip1.png)
 
-```javascript
-/".\*"/.test('"abc"de');
-```
-
-```javascript
-/^\d{1,3}?\d{1,3}$/.test('12345');
-```
-
-- [示例 1](./images/huisu.png)
-
-- [示例 2](./images/huisu1.png)
-
-- [示例 3](./images/huisu2.png)
+通过 SSLstrip 强制使 https 降级为 http
 
 ---
 
-### 回到问题
-
-- 匹配手机号
-- 验证密码强度
-- 驼峰转连字符风格
-- 添加千分位分隔符
-- 匹配形如 abba 的字符串
-
---
-
-- 不匹配形如 abba 的字符串
-- 验证一个字符串是否至少包含三个数字
+# HSTS
 
 ???
 
-```javascript
-// 匹配手机号
-/^((?!86-)\d+-\d{6,}|(86-)?1\d{10})$/.test('12456454542');
-// 验证密码强度
-const reg = /((?=.*\d)(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])|(?=.*[a-z])(?=.*[AZ]))^[0-9A-Za-z]{6,12}$/;
-const reg1 = /(?!^\d{6,12}$)(?!^[a-z]{6,12}$)(?!^[A-Z]{6,12}$)^[0-9A-Za-z]{6,12}$/;
-// 驼峰转连字
-'AsdfsdBsdasadC'.replace(/\B(?=[A-Z])/g, '-').toLowerCase();
-'AsdfsdBsdasadC'.replace(/\B([A-Z])/g, '-$1').toLowerCase();
-// 添加千分位
-'123212312312312'.replace(/(?!^)(?=(\d{3})+$)/g, ',');
-```
+之前有解决方案：js 检测当前是否 https，不是则通过 location 跳转到 https，但敌不过别人直接给你把代码替换掉
 
-[不匹配 abba 类型 demo](./demo/1.html)
+Strict-Transport-Security: max-age=31536000
 
-```javascript
-/^(?!.*(.)(.)\2\1)/.test('312312abbdewr23423');
-```
+添加到 HSTS 列表 https://hstspreload.org/ google 维护
 
-#### 验证字符串是否至少包含 3 位数字
+[HTTP Strict Transport Security](https://developer.mozilla.org/zh-CN/docs/Security/HTTP_Strict_Transport_Security)
 
-```javascript
-/(\D*\d){3}/.test('dasdas12');
-```
+## 本地添加测试 chrome://net-internals/#hsts
+
+---
+
+我们的网站应不应该使用 HTTPS？
+
+???
+
+答案是毋庸置疑的：
+
+1. 正确部署完 HTTPS，配置 HSTS 以后，通信安全是可以得到极大保障的
+2. RSA 的破解，以现在的技术很难
+3. 相信 CA 机构的节操
 
 ---
 
 ```
-    console.log("Thanks!");
+  console.log("Thanks!");
 ```
